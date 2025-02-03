@@ -20,8 +20,6 @@ rootProject.allprojects {
 }
 
 apply plugin: 'com.android.library'
-apply plugin: 'dev.flutter.flutter-gradle-plugin'
-
 android {
     namespace "flutter.plugins.contactsservice.contactsservice"
     compileSdk flutter.compileSdkVersion
