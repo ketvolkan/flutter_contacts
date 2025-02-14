@@ -41,7 +41,7 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
+import io.flutter.embedding.engine.plugins.FlutterPlugin;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.provider.ContactsContract.CommonDataKinds;
@@ -70,11 +70,26 @@ public class ContactsServicePlugin implements MethodCallHandler, FlutterPlugin, 
     this.delegate = new ContactServiceDelegateOld(registrar);
   }
 
-  public static void registerWith(Registrar registrar) {
-    ContactsServicePlugin instance = new ContactsServicePlugin();
-    instance.initInstance(registrar.messenger(), registrar.context());
-    instance.initDelegateWithRegister(registrar);
-  }
+  
+    @Override
+    public void onAttachedToEngine(FlutterPluginBinding binding) {
+        BinaryMessenger messenger = binding.getBinaryMessenger();
+        Context context = binding.getApplicationContext();
+
+        // Kanalı başlat
+        channel = new MethodChannel(messenger, "contacts_service");
+        
+        // Gerekli başlatma işlemlerini yap
+        initInstance(messenger, context);
+    }
+
+    @Override
+    public void onDetachedFromEngine(FlutterPluginBinding binding) {
+        if (channel != null) {
+            channel.setMethodCallHandler(null);
+            channel = null;
+        }
+    }
 
   private void initInstance(BinaryMessenger messenger, Context context) {
     methodChannel = new MethodChannel(messenger, "github.com/clovisnicolas/flutter_contacts");
